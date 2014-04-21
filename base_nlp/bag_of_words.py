@@ -87,23 +87,12 @@ class Bow:
             for i in ((self.df).index):
                 id_list.append((self.df)[id_name][i])
                 text = (self.df)[col_name][i]
-                processed = nltk.clean_html(text)
-                senttokens = nltk.sent_tokenize(processed)
-
-                wordtokens = []
-
-                for sentence in senttokens:
-                    wordtokens.append(nltk.word_tokenize(sentence.translate(None, string.punctuation)))
-
-                wordtokens = list(itertools.chain.from_iterable(wordtokens))
-                stoptokens = [w for w in wordtokens if not w in stopwords.words('english')]
-                unitokens = [w.decode('unicode_escape').encode('ascii', 'ignore') for w in stoptokens]
-                tokens = [w.lower() for w in unitokens if not w.isdigit()]
+                wordtokens = text.split('\n').split('.').split('')
+                tokens = [w.decode('unicode_escape').encode('ascii', 'ignore').lower() for w in wordtokens if not w in stopwords.words('english') or w.isdigit()]
 
                 if stem == True:
                     stemmer = nltk.PorterStemmer()
-                    stemmed = [porter.stem(t) for t in tokens]
-                    tokens = [i for i in stemmed if len(i) > 3]
+                    tokens = [porter.stem(t) for t in tokens if len(porter.stem(t)) > 3]
 
                 yield tokens
             
@@ -113,36 +102,20 @@ class Bow:
         else:
             
             id_list = []
-            text_list = []
 
             for root, dirs, files in os.walk(self.topdir):
                 for file in filter(lambda file: file.endswith('.txt'), files):
                     id_list.append((file.split('.')[0]))
-                    raw = open(os.path.join(root, file),'rU').read()
+                    text = open(os.path.join(root, file),'rU').read()
+                    wordtokens = text.split('\n').split('.').split('')
+                    tokens = [w.decode('unicode_escape').encode('ascii', 'ignore').lower() for w in wordtokens if not w in stopwords.words('english') or w.isdigit()]
 
-                    text_list.append(raw)
-                    
-                    processed = nltk.clean_html(raw)
-                    senttokens = nltk.sent_tokenize(processed)
-
-                    wordtokens = []
-
-                    for sentence in senttokens:
-                        wordtokens.append(nltk.word_tokenize(sentence.translate(None, string.punctuation)))
-            
-                    wordtokens = list(itertools.chain.from_iterable(wordtokens))
-                    stoptokens = [w for w in wordtokens if not w in stopwords.words('english')]
-                    unitokens = [w.decode('unicode_escape').encode('ascii', 'ignore') for w in stoptokens]
-                    tokens = [w.lower() for w in unitokens if not w.isdigit()]
-            
                     if stem == True:
                         stemmer = nltk.PorterStemmer()
-                        stemmed = [porter.stem(t) for t in tokens]
-                        tokens = [i for i in stemmed if len(i) > 3]
+                        tokens = [porter.stem(t) for t in tokens if len(porter.stem(t)) > 3]
                     
                     yield tokens
             
-            #self.df = pd.DataFrame([id_list, text_list], columns = ['file_name', 'text'])
             self.id_list = id_list
             self.doc_cnt = len(id_list)
                 
@@ -227,19 +200,21 @@ class Bow:
         word_matrix = self.word_matrix
         vocab = self.vocab
         counts = np.array(word_matrix.sum(0)).astype(int).flatten().tolist()
-        term_count = dict(zip(vocab.keys(), counts))
-        doc_count = word_matrix.shape[0]    
+        term_count = dict(zip(vocab.keys(), counts))  
 
         for term in vocab.keys():
             if len(term) < min_word_len:
                 del vocab[term]
-            elif (term_count[term]/doc_count) > max_word_pct:
+                del term_count[term] 
+            elif (term_count[term]/self.doc_cnt) > max_word_pct:
                 del vocab[term]
+                del term_count[term]
             elif (term_count[term]) < min_word_cnt:
                 del vocab[term]
+                del term_count[term]
 
         for term in sorted(term_count, key=term_count.get):
-            if term in vocab.keys() and len(vocab) > max_vocab_size:
+            if len(vocab) > max_vocab_size:
                 del vocab[term]
 
         reindex = vocab.values()
@@ -345,26 +320,14 @@ def single_tokenizer(text, stem = False):
     tokens : list
         list of strings containing tokens
     """
-    raw = text
-    processed = nltk.clean_html(raw)
-    senttokens = nltk.sent_tokenize(processed)
+    wordtokens = text.split('\n').split('.').split('')
+    tokens = [w.decode('unicode_escape').encode('ascii', 'ignore').lower() for w in wordtokens if not w in stopwords.words('english') or w.isdigit()]
 
-    wordtokens = []
-
-    for sentence in senttokens:
-        wordtokens.append(nltk.word_tokenize(sentence.translate(None, string.punctuation)))
-
-    wordtokens = list(itertools.chain.from_iterable(word_tokens))
-    stoptokens = [w for w in wordtokens if not w in stopwords.words('english')]
-    unitokens = [w.decode('unicode_escape').encode('ascii', 'ignore') for w in stoptokens]
-    tokens = [w for w in unitokens if not w.isdigit()]
-        
     if stem == True:
         stemmer = nltk.PorterStemmer()
-        stemmed = [porter.stem(t) for t in tokens]
-        tokens = [i for i in stemmed if len(i) > 3]
-
-    return tokens
+        tokens = [porter.stem(t) for t in tokens if len(porter.stem(t)) > 3]
+                    
+    yield tokens
 
 def doc2bow(tokens, vocab):
     """
