@@ -59,8 +59,10 @@ class Bow:
             for file in filter(lambda file: file.endswith('.txt'), files):
                 id_list.append((file.split('.')[0]))
                 text = open(os.path.join(root, file),'rU').read()
-                wordtokens = text.split('\n').split('.').split('')
-                tokens = [w.decode('unicode_escape').encode('ascii', 'ignore').lower() for w in wordtokens if not w in stopwords.words('english') or w.isdigit()]
+                split = text.translate(None, string.punctuation).split()
+                tokens = [w.decode('unicode_escape').encode('ascii', 'ignore').lower()
+                          for w in split if not w in stopwords.words('english')
+                          or w.isdigit()]
 
                 if self.stem == True:
                     stemmer = nltk.PorterStemmer()
