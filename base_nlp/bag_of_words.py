@@ -1,7 +1,5 @@
 from __future__ import division
 import scipy.sparse as sp
-import data_odbc as do
-import pandas as pd
 import numpy as np
 import itertools
 import string
@@ -16,7 +14,7 @@ from collections import Counter, defaultdict
 
 class Bow:
 
-    def __init__(self, query=None, dsn=None, df=None, topdir=None, method='dir'):
+    def __init__(self, topdir = None, stem = False):
         """
         A class to support basic bag of words operations. Can tokenize,
         vectorize and weight you incoming text data and output term_document
@@ -24,53 +22,28 @@ class Bow:
 
         Parameters
         ----------
-        query : string, default = None
-            A sql query that returns the data you wish to transform, with at
-            minimum a primary key and the text.
-
-        dsn : string, default = None
-            The dsn from an odbc.ini file, points to a database.
-        
-        df : pandas dataframe, default = None
-            A pandas dataframe containing your text data with a primary key
-            and the text.
-
-        topdir : string, default = None
-            The file location where you text files (in .txt format) reside.
-
-        method : ['df', 'sql', 'dir'], default = 'dir'
-            The method of input, if 'df' expects a df keyword, if 'sql'
-            expects the dsn and query keywords, and if 'dir' expects the
-            topdir keyword.
+        topdir : string
+            the location of the directory containing the text documents to be
+            analyzed
         """
+        
+        self.topdir = topdir
+        self.stem = stem
+
         self.vocab = None
         self.word_matrix = None
         self.vocab_cnt = None
+
         self.id_list = []
         self.doc_cnt = 0
-        self.method = method
 
-        if method == 'df':
-            self.df = df
-        if method == 'sql':
-            conn = do.Sql(dsn=dsn)
-            self.df = conn.query(query, select=True)
-        if method == 'dir':
-            self.topdir = topdir
-
-    def tokenizer(self, col_name=None, id_name=None, stem=False):
+    def tokenizer(self):
         """
         Takes raw text data parses it into tokens in the form of individual
         words. 
 
         Parameters
         ----------
-        col_name : string
-            name of the column where the text data resides
-        
-        id_name : string
-            name of the column that uniquely identifies each document
-
         stem : bool, default = False
             the option to stem the tokens, which will increase accuracy but
             decrease readability
@@ -80,46 +53,25 @@ class Bow:
         tokens: generator
         """
 
-        if self.method == ('df' or 'sql'):
-            
-            id_list = []
+        id_list = []
 
-            for i in ((self.df).index):
-                id_list.append((self.df)[id_name][i])
-                text = (self.df)[col_name][i]
+        for root, dirs, files in os.walk(self.topdir):
+            for file in filter(lambda file: file.endswith('.txt'), files):
+                id_list.append((file.split('.')[0]))
+                text = open(os.path.join(root, file),'rU').read()
                 wordtokens = text.split('\n').split('.').split('')
                 tokens = [w.decode('unicode_escape').encode('ascii', 'ignore').lower() for w in wordtokens if not w in stopwords.words('english') or w.isdigit()]
 
-                if stem == True:
+                if self.stem == True:
                     stemmer = nltk.PorterStemmer()
                     tokens = [porter.stem(t) for t in tokens if len(porter.stem(t)) > 3]
-
-                yield tokens
-            
-            self.id_list = id_list
-            self.doc_cnt = len(id_list)
-
-        else:
-            
-            id_list = []
-
-            for root, dirs, files in os.walk(self.topdir):
-                for file in filter(lambda file: file.endswith('.txt'), files):
-                    id_list.append((file.split('.')[0]))
-                    text = open(os.path.join(root, file),'rU').read()
-                    wordtokens = text.split('\n').split('.').split('')
-                    tokens = [w.decode('unicode_escape').encode('ascii', 'ignore').lower() for w in wordtokens if not w in stopwords.words('english') or w.isdigit()]
-
-                    if stem == True:
-                        stemmer = nltk.PorterStemmer()
-                        tokens = [porter.stem(t) for t in tokens if len(porter.stem(t)) > 3]
-                    
-                    yield tokens
-            
-            self.id_list = id_list
-            self.doc_cnt = len(id_list)
                 
-    def vectorizer(self, col_name=None, id_name=None, stem=False):
+                yield tokens
+        
+        self.id_list = id_list
+        self.doc_cnt = len(id_list)
+                
+    def vectorizer(self):
         """
         Turns tokens into a word vector in the bag of words format. Also
         builds a vocabulary which contains all of the unique words from the
@@ -137,10 +89,6 @@ class Bow:
         stem : bool, default = False
             the option to stem the tokens, which will increase accuracy but
             decrease readability
-
-        Returns
-        -------
-
         """
         vocab = defaultdict(None)
         vocab.default_factory = vocab.__len__
@@ -149,7 +97,7 @@ class Bow:
         indptr = array.array(str('i'))
         indptr.append(0)
 
-        for tokens in Bow.tokenizer(self, col_name, id_name, stem):
+        for tokens in Bow.tokenizer(self):
             for token in tokens:
                 indices.append(vocab[token])
             indptr.append(len(indices))
@@ -174,13 +122,6 @@ class Bow:
         min_word_len : integer, default = 4
             the minimum word lengcol_name : string
             name of the column where the text data resides
-        
-        id_name : string
-            name of the column that uniquely identifies each document
-
-        stem : bool, default = False
-            the option to stem the tokens, which will increase accuracy but
-            decrease readabilityth allowed, shorten if using stemming
 
         max_word_pct : float, default = 1
             the maximum occurance rate of a word, default is set to allow
@@ -192,10 +133,6 @@ class Bow:
 
         max_vocab_size : int, default = 100000
             the maximum size of your vocab
-
-        Returns
-        -------
-
         """
         word_matrix = self.word_matrix
         vocab = self.vocab
@@ -230,13 +167,6 @@ class Bow:
         """
         Performs a tfidf transformation on word vectors, using augmented term
         frequency for increased accuracy.
-
-        Parameters
-        ---------
-
-        Returns
-        -------
-
         """
         word_matrix = self.word_matrix
         vocab = self.vocab
