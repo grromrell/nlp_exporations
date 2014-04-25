@@ -80,7 +80,7 @@ Short Term
     1. Create attributes that allow for more advanced NLP handling (NER, 
        POS Tagging etc.)
     2. Include discrete clustering using DBSCAN and other algorithms
-    3. Include work done from Cebu regarding advanced cluster analysis
+    3. Include new work regarding advanced cluster analysis
 
 ---------
 Long Term
