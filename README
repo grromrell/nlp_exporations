@@ -7,9 +7,9 @@ with scikit-learn and nltk in speed (obviously not there yet).
 Tutorial
 --------
 
-There are currently two modules: bag_of_words and cluster. Of the two only
-bag_of_words is full functional. More modules will be added as the project
-matures.
+There are currently two modules: bag_of_words and cluster. Bag_of_words is 
+undergoing experimentation with the tokenization for speed improvements,
+and cluster currently only contains DBSCAN.
 
 [bag_of_words]
 
@@ -71,34 +71,21 @@ this tutorial will focus on using it.
        newly transformed data and use it to cluster or any number of things!
     
     5. There is further functionality in this module, such as gensim compatibil-
-       ity and csv writers, and these functions are documented in the code.
+       ity and csv writers, and these functions are documented in the code. 
 
 ----------
 Short Term
 ----------
 
-    1. Create attributes that allow for more advanced NLP handling (NER, 
-       POS Tagging etc.)
-    2. Include discrete clustering using DBSCAN and other algorithms
-    3. Include new work regarding advanced cluster analysis
+    1. Update tokenization and vocab trimming for speed improvement
+    2. Remove all nltk dependencies, most notably stopwords
 
 ---------
 Long Term
 ---------
 
-    1. Replace all NLTK dependencies, mainly the stopword list and tokenizer
-    2. Include tools that can take advantage of bag of words approach, like 
+    1. Include tools that can take advantage of bag of words approach, like 
        topic modelling and latent semantic analysis
-    3. Include native support for many different distance measures 
+    2. Include native support for many different distance measures 
        (or just use scipy?)
-    4. Cython?
-
----------------
-Completed Goals
----------------
-[Version 0.3]
-    Allow for dictionary to be output with frequency values
-    Create a non-SQL dependent version of the tokenization tool
-
-[Version 0.2]
-    Update Dictionary handling to allow for rule based stop words removal
+    3. Cython?
