@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
       name='nlp',
-      version='.3',
+      version='.1',
       description='Personal NLP Tools',
       author='Greg Romrell',
       author_email='grromrell@gmail.com',
