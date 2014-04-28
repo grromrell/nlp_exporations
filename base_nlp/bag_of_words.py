@@ -1,7 +1,6 @@
 from __future__ import division
 import scipy.sparse as sp
 import numpy as np
-import gensim
 import string
 import array
 import nltk
@@ -307,6 +306,10 @@ def corpus_gensim(word_matrix, stream=False):
     corpus : gensim.corpus
         a gensim corpus for static use
     """
+    try:
+        import gensim
+    except:
+        raise ValueError("Gensim compatability requires gensim to be installed")
     if stream:
         corpus = gensim.matutils.Sparse2Corpus(word_matrix.T)
     else:
@@ -330,5 +333,9 @@ def vector_gensim(vector):
     bow : gensim.sparse
         a word vector in the correct gensim format
     """
+    try:
+        import gensim
+    except:
+        raise ValueError("Gensim compatability requires gensim to be installed")
     bow = gensim.matutils.scipy2sparse(vector.T)
     return bow
