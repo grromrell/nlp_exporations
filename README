@@ -77,8 +77,7 @@ this tutorial will focus on using it.
 Short Term
 ----------
 
-    1. Update tokenization and vocab trimming for speed improvement
-    2. Remove all nltk dependencies, most notably stemmer
+    1. Investigate stemmer options, particularly Prter and Lovins
 
 ---------
 Long Term
