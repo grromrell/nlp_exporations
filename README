@@ -78,14 +78,16 @@ Short Term
 ----------
 
     1. Update tokenization and vocab trimming for speed improvement
-    2. Remove all nltk dependencies, most notably stopwords
+    2. Remove all nltk dependencies, most notably stemmer
 
 ---------
 Long Term
 ---------
-
-    1. Include tools that can take advantage of bag of words approach, like 
+    
+    1. N-gram support
+    2. Include tools that can take advantage of bag of words approach, like 
        topic modelling and latent semantic analysis
-    2. Include native support for many different distance measures 
+    3. Include native support for many different distance measures 
        (or just use scipy?)
-    3. Cython?
+    4. Cython?
+    5. More advanced tokenization methods (Penn Treebank, Stanford)
