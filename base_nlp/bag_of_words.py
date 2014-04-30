@@ -42,8 +42,7 @@ class Bow:
             to filter stopwords
 
         min_word_len : integer, default = 4
-            the minimum word lengcol_name : string
-            name of the column where the text data resides
+            the minimum word length
 
         max_word_pct : float, default = 1
             the maximum occurance rate of a word, default is set to allow
