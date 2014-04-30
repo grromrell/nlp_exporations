@@ -1,8 +1,8 @@
 base_nlp
 --------
 
-This package is meant to hold some basic nlp tools, and over time compete
-with scikit-learn and nltk in speed (obviously not there yet).
+This package is meant to hold some basic nlp tools, with the goal to get
+more sophisticated over time.
 
 Tutorial
 --------
