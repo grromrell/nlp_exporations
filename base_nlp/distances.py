@@ -2,6 +2,32 @@ import math
 import numpy
 import scipy.sparse
 
+def normalize(matrix):
+    """
+    normalize matrix to euclidean norm
+    
+    Parameters
+    ----------
+    matrix : scipy.sparse matrix
+        matrix to be normalized
+    Returns
+    -------
+    matrix : scipy.sparse matrix
+        normalized matrix
+    """
+    if not scipy.sparse.issparse(matrix):
+        matrix = (matrix * matrix.T).sum(axis=1)
+    else:
+        for i in xrange(matrix.shape[0]):
+            total = 0.0
+            for j in xrange(matrix.indptr[i], matrix.indptr[i+1]):
+                total += matrix.data[j]**2
+            if not total:
+                continue
+            for k in xrange(matrix.indptr[i], matrix.indptr[i+1]):
+                matrix.data /= total
+    return matrix
+
 def compute_similarity(matrix):
     """
     compute cosine similarity for matrices that fit in memory
@@ -10,12 +36,12 @@ def compute_similarity(matrix):
     ----------
     matrix: scipy.sparse or numpy.array
         term document matrix
-
     Returns
     -------
     distance_matrix: numpy.array
         cosine similarity matrix
     """
+    matrix = normalize(matrix)
     if scipy.sparse.issparse(matrix):
         distance_matrix = (matrix * matrix.T).toarray()
     else:
@@ -43,6 +69,7 @@ def compute_ooc(matrix):
         import tables
     except:
         raise ValueError('Large distance calculation depends on pytables')
+    matrix = normalize(matrix)
     f = tables.open_file('distance_matrix.h5', 'w')
     filters = tables.Filters(complevel=3, complib='blosc')
     distance_matrix = f.create_carray(f.root, 'distance_matrix', 
@@ -77,6 +104,8 @@ def compute_row(matrix, row):
     -------
     distance_vector : numpy.array
     """
+    matrix = normalize(matrix)
+    row = normalize(row)
     if scipy.sparse.issparse(matrix):
         distance_vector = ((row * matrix.T).toarray())[0]
     else:
