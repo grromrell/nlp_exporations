@@ -22,11 +22,20 @@ def compute_similarity(matrix):
         distance_matrix = matrix * matrix.T
     return distance_matrix
 
-def compute_large(matrix):
+def compute_ooc(matrix):
     """
     compute cosine similarity out of core for large matrices. A large part of
     this method was writen by Francesc Alted. Source: Copyright (c) 2013,
     Francesc Alted BSD
+
+    Parameters
+    ----------
+    matrix : scipy.sparse matrix
+        term document matrix
+    Returns
+    -------
+    distance_matrix : hdf5 cArray
+        similarity matrix
     """
     if not scipy.sparse.issparse(matrix):
         raise ValueError('Input matrix is not a scipy.sparse matrix')
@@ -54,4 +63,22 @@ def compute_large(matrix):
 
     return distance_matrix
 
-
+def compute_row(matrix, row):
+    """
+    compute the cosine similarity by row
+    
+    Parameters
+    ----------
+    matrix : scipy.sparse or numpy.array
+        term document matrix
+    row : scipy.sparse or numpy.array
+        single bag of words vector
+    Returns
+    -------
+    distance_vector : numpy.array
+    """
+    if scipy.sparse.issparse(matrix):
+        distance_vector = ((row * matrix.T).toarray())[0]
+    else:
+        distance_vector = row * matrix.T
+    return distance_vector
