@@ -3,10 +3,10 @@ import scipy.sparse as sp
 import numpy as np
 import string
 import array
-import nltk
 import csv
 import os
 import re
+from stemming import PorterStemmer
 from stop_words import stop_list
 from collections import Counter, defaultdict
 
@@ -121,8 +121,8 @@ class Bow:
                 tokens = [w.encode('utf-8', 'ignore').decode('utf-8').lower()
                           for w in words if w not in self.stop_words]
                 if self.stem:
-                    stemmer = nltk.PorterStemmer()
-                    tokens = [porter.stem(t) for t in tokens if len(porter.stem(t)) > 3]
+                    stemmer = PorterStemmer()
+                    tokens = [stemmer.stem(t) for t in tokens]
                 
                 yield tokens
         
