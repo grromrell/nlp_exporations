@@ -1,6 +1,12 @@
 VOWELS = frozenset(['a', 'e', 'i', 'o', 'u', 'y'])
 DOUBLES = frozenset(['bb', 'dd', 'ff', 'gg', 'mm', 'nn', 'pp', 'rr', 'tt'])
 LI_ENDING = frozenset(['c', 'd', 'e', 'g', 'h', 'k', 'm', 'n', 'r', 't'])
+INVARIANTS = frozenset(['sky', 'news', 'howe', 'atlas', 'cosmos', 'bias',
+                       'andes'])
+EXCEPTIONS = frozenset(['skis', 'skies', 'dying', 'lying', 'tying', 'idly',
+                        'gently', 'ugly', 'early', 'only', 'singly', 'inning',
+                        'outing', 'canning', 'herring', 'earring', 'proceed',
+                        'exceed', 'succeed'])
 
 class PorterStemmer(object):
     
@@ -18,9 +24,14 @@ class PorterStemmer(object):
             index = word.find('y')
             word[index] = 'Y'
         self.word = word
+        if self.word in [EXCEPTIONS or INVARIANTS]:
+            self._exception_handler()
+            yield self.word
         self._region_finder()
         self.step0()
         self.step1a()
+        if self.word in EXCEPTIONS:
+            yield self.word
         self.step1b()
         self.step1c()
         self.step2()
@@ -182,3 +193,29 @@ class PorterStemmer(object):
             return True
         else:
             return False
+    
+    def _exception_handler(self):
+        if self.word in INVARIANTS:
+            pass
+        elif self.word == 'skis':
+            self.word = 'ski'
+        elif self.word == 'skies':
+            self.word = 'sky'
+        elif self.word == 'dying':
+            self.word = 'die'
+        elif self.word == 'lying':
+            self.word = 'lie'
+        elif self.word == 'tying':
+            self.word = 'tie'
+        elif self.word == 'idly':
+            self.word = 'idl'
+        elif self.word == 'gently':
+            self.word = 'gentl'
+        elif self.word == 'ugly':
+            self.word = 'ugli'
+        elif self.word == 'early':
+            self.word = 'earli'
+        elif self.word == 'only':
+            self.word = 'onli'
+        elif self.word == 'singly':
+            self.word = 'singl'
