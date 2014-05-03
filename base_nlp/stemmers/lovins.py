@@ -6,7 +6,43 @@ class LovinsStemmer(object):
         yield self.word
 
     def stemming(self):
-        pass
+        suffix_list = [end for end in SUFFIXES if self.word.endswith(end)]
+        if suffix_list:
+            suffix = max(suffix_list, key=len)
+            if suffix in SUFFIXES[:203]:
+                self.word = self.word.replace(suffix, '')
+            elif suffix in SUFFIXES[203:232]:
+                if len(self.word.replace(suffix, '')) >= 3:
+                    self.word = self.word.replace(suffix, '')
+            elif suffix in SUFFIXES[232:238]:
+                if len(self.word.replace(suffix, '')) >= 4:
+                    self.word = self.word.replace(suffix, '')
+            elif suffix in SUFFIXES[238:239]:
+                if len(self.word.replace(suffix, '')) >= 5:
+                    self.word = self.word.replace(suffix, '')
+            elif suffix in SUFFIXES[239:253]:
+                if self.word.replace(suffix, '')[-1] != 'e':
+                    self.word = self.word.replace(suffix, '')
+            elif suffix in SUFFIXES[253:261]:
+                if len(self.word.replace(suffix, '')) >= 3:
+                    if self.word.replace(suffix, '')[-1] != 'e':
+                        self.word = self.word.replace(suffix, '')
+            elif suffix in SUFFIXES[261:263]:
+                if len(self.word.replace(suffix, '')) >= 3:
+                    if self.word.replace(suffix, '')[-1] == 'f':
+                        self.word = self.word.replace(suffix, '')
+            elif suffix in SUFFIXES[263:264]:
+                if self.word.replace(suffix, '')[-1] in ['t', 'll']:
+                    self.word = self.word.replace(suffix, '')
+            elif suffix in SUFFIXES[264:267]:
+                if self.word.replace(suffix, '')[-1] not in ['o', 'e']:
+                    self.word = self.word.replace(suffix, '')
+            elif suffix in SUFFIXES[267:268]:
+                if self.word.replace(suffix, '')[-1] not in ['a', 'e']:
+                    self.word = self.word.replace(suffix, '')
+            elif suffix in SUFFIXES[268:269]:
+                if len(self.word.replace(suffix, '')) >= 3:
+
 
 SUFFIXES = ['arizability', 'antialness', 'arisations', 'arizations',
             'entialness', 'antaneous', 'antiality', 'arisation', 'arization',
