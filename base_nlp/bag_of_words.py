@@ -6,13 +6,14 @@ import array
 import csv
 import os
 import re
-from stemming import PorterStemmer
+from stemmers.porter import PorterStemmer
+from stemmers.lovins import LovinsStemmer
 from stop_words import stop_list
 from collections import Counter, defaultdict
 
 class Bow:
 
-    def __init__(self, topdir=None, tokenizer='word_size', stem=False, 
+    def __init__(self, topdir=None, tokenizer='word_size', stemmmer=None, 
                  stop_words=True, min_word_len=4, max_word_pct=1, min_word_cnt=0, 
                  max_vocab_size=100000):
         """
@@ -32,9 +33,11 @@ class Bow:
             punctuation will split on punctuation. Can also pass a regex
             statement that be used to parse the text.
 
-        stem : bool, default = False
+        stem : ['porter', 'lovins'], default = None
             the option to stem the tokens, which will increase accuracy but
-            decrease readability
+            decrease readability. Options are the porter stemmer or the lovins
+            stemmer. If not value is passed then the words will not be 
+            stemmed.
 
         stop_words : bool or iterable, default=True
             strips out english stopwords when true, if false then stop words
@@ -57,7 +60,6 @@ class Bow:
         """
         self.topdir = topdir
         self.tokenizer = tokenizer
-        self.stem = stem
         self.min_word_len = min_word_len
         self.max_word_pct = max_word_pct
         self.min_word_cnt = min_word_cnt
@@ -76,6 +78,15 @@ class Bow:
                 self.stop_words = stop_words
             else:
                 self.stop_words = stop_list
+
+        if stemmer == 'porter':
+            self.stem = PorterStemmer()
+        elif stemmer == 'lovins':
+            self.stem = LovinsStemmer()
+        elif not stemmer:
+            self.stem = None
+        else:
+            raise ValueError('%s is not a valid stemmer') % stemmer
 
     def _word_tokenize(self, text):
         """
@@ -120,9 +131,8 @@ class Bow:
                 words = self._word_tokenize(text)
                 tokens = [w.encode('utf-8', 'ignore').decode('utf-8').lower()
                           for w in words if w not in self.stop_words]
-                if self.stem:
-                    stemmer = PorterStemmer()
-                    tokens = [stemmer.stem(t) for t in tokens]
+                if self.stemmer:
+                    tokens = [self.stemmer.stem(t) for t in tokens]
                 
                 yield tokens
         
