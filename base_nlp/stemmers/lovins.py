@@ -1,4 +1,5 @@
 import re
+#TODO: How to fix the indexing problem on REGEX. Is there are better way?
 
 class LovinsStemmer(object):
     def __init__(self):
@@ -8,7 +9,7 @@ class LovinsStemmer(object):
         self.word = word
         self.stem_rules()
         self.recode()
-        yield self.word
+        return self.word
 
     def stem_rules(self):
         suffix = ''
@@ -50,28 +51,29 @@ class LovinsStemmer(object):
             elif suffix in SUFFIXES[268:269]:
                 if len(self.word.replace(suffix, '')) >= 3:
                     if self.word.replace(suffix, '')[-1] in ['l', 'i']:
-                        if re.search(r'u*e', self.word.replace(suffix, ''))[-3]:
+                        if re.search(r'u.e', self.word.replace(suffix, '')): #[:-3]:
                             self.word = self.word.replace(suffix, '')
             elif suffix in SUFFIXES[269:271]:
-                if self.word.replace(suffix, '')[-2] == 'os':
+                if self.word.replace(suffix, '')[:-2] == 'os':
                     self.word = self.word.replace(suffix, '')
                 elif self.word.replace(suffix, '')[-1] not in ['u', 'x', 's']:
                     self.word = self.word.replace(suffix, '')
             elif suffix in SUFFIXES[271:273]:
                 if self.word.replace(suffix, '')[-1] not in ['a', 'c', 'e', 'm']:
                     self.word = self.word.replace(suffix, '')
-            elif suffix in SUFFIXES[273:275]:
-                if re.search(r's**', self.word.replace(suffix, '')[-3]):
-                    if len(self.word.replace(suffix, '')) >= 4:
-                        self.word = self.word.replace(suffix, '')
-                elif len(self.word.replace(suffix, '')) >= 3:
-                    self.word.replace(suffix, '')
+            elif suffix in SUFFIXES[273:275]: 
+                if len(self.word.replace(suffix, '')) >= 3:
+                    if re.search(r's..', self.word.replace(suffix, '')[:-3]):
+                        if len(self.word.replace(suffix, '')) >= 4:
+                            self.word = self.word.replace(suffix, '')
+                    else:
+                        self.word.replace(suffix, '')
             elif suffix in SUFFIXES[275:276]:
                 if self.word.replace(suffix, '')[-1] in ['l', 'i']:
                     self.word = self.word.replace(suffix, '')
             elif suffix in SUFFIXES[276:277]:
                 if self.word.replace(suffix, '')[-1] != 'c':
-                    self.word = word.replace(suffix, '')
+                    self.word = self.word.replace(suffix, '')
             elif suffix in SUFFIXES[277:278]:
                 if len(self.word.replace(suffix, '')) >= 3:
                     if self.word.replace(suffix, '')[-1] not in ['l', 'n']:
@@ -80,15 +82,15 @@ class LovinsStemmer(object):
                 if self.word.replace(suffix, '')[-1] in ['n', 'r']:
                     self.word = self.word.replace(suffix, '')
             elif suffix in SUFFIXES[280:281]:
-                if self.word.replace(suffix, '')[-2] == 'tt':
+                if self.word.replace(suffix, '')[:-2] == 'tt':
                     pass
-                elif self.word.replace(suffix, '')[-2] == 'dr':
+                elif self.word.replace(suffix, '')[:-2] == 'dr':
                     self.word = self.word.replace(suffix, '')
                 elif self.word.replace(suffix, '')[-1] == 't':
                     self.word = self.word.replace(suffix, '')
             elif suffix in SUFFIXES[281:282]:
                 if self.word.replace(suffix, '')[-1] in ['s', 't']:
-                    if self.word.replace(suffix, '')[-2] == 'ot':
+                    if self.word.replace(suffix, '')[:-2] == 'ot':
                         pass
                     else:
                         self.word = self.word.replace(suffix, '')
@@ -104,10 +106,10 @@ class LovinsStemmer(object):
             elif suffix in SUFFIXES[285:286]:
                 if self.word.replace(suffix, '')[-1] in ['l', 'i']:
                     self.word = self.word.replace(suffix, '')
-                elif re.search(r'u*e', word.replace(suffix, '')[-3]):
+                elif re.search(r'u.e', self.word.replace(suffix, '')[:-3]):
                     self.word = self.word.replace(suffix, '')
             elif suffix in SUFFIXES[286:290]:
-                if self.word.replace(suffix, '')[-2] == 'in':
+                if self.word.replace(suffix, '')[:-2] == 'in':
                     self.word = self.word.replace(suffix, '')
             elif suffix in SUFFIXES[290:291]:
                 if self.word.replace(suffix, '')[-1] != 'f':
@@ -115,13 +117,13 @@ class LovinsStemmer(object):
             elif suffix in SUFFIXES[291:292]:
                 if self.word.replace(suffix, '')[-1] in ['d','f', 'l', 't']:
                     self.word = self.word.replace(suffix, '')
-                elif self.word.replace(suffix, '')[-2] in ['ph', 'th', 'er', 
+                elif self.word.replace(suffix, '')[:-2] in ['ph', 'th', 'er', 
                                                            'or', 'es']:
                     self.word = self.word.replace(suffix, '')
             elif suffix in SUFFIXES[292:295]:
                 if len(self.word.replace(suffix, '')) >= 3:
-                    if self.word.replace(suffix, '')[-3] not in ['met']:
-                        if self.word.replace(suffix, '')[-4] not in ['ryst']:
+                    if self.word.replace(suffix, '')[:-3] not in ['met']:
+                        if self.word.replace(suffix, '')[:-4] not in ['ryst']:
                             self.word = self.word.replace(suffix, '')
             elif suffix in SUFFIXES[295:296]:
                 if self.word.replace(suffix, '')[-1] == 'l':
@@ -132,21 +134,24 @@ class LovinsStemmer(object):
                                                'nn', 'nn', 'pp', 'rr', 'ss',
                                                'tt',]):
             self.word = self.word[:-1]
-        elif self.word.endswith('ul'):
-            if self.word[-3] not in ['a', 'o', 'i']:
-                self.word = self.word.replace('ul', 'l')
-        elif self.word.endswith('end'):
-            if self.word[-4] != 's':
-                self.word = self.word.replace('end', 'ens')
-        elif self.word.endswith('her'):
-            if self.word[-4] not in ['p', 't']:
-                self.word = self.word.replace('her', 'hes')
-        elif self.word.endswith('ent'):
-            if self.word[-4] != 'm':
-                self.word = self.word.replace('ent', 's')
-        elif self.word.endswith('et'):
-            if self.word[-3] != 'n':
-                self.word = self.word.replace('et', 'es')
+        if len(self.word) >= 3:
+            if self.word.endswith('et'):
+                if self.word[-3] != 'n':
+                    self.word = self.word.replace('et', 'es')
+            elif self.word.endswith('ul'):
+                if self.word[-3] not in ['a', 'o', 'i']:
+                    self.word = self.word.replace('ul', 'l')
+        if len(self.word) >= 4:
+            if self.word.endswith('end'):
+                if self.word[-4] != 's':
+                    self.word = self.word.replace('end', 'ens')
+            elif self.word.endswith('her'):
+                if self.word[-4] not in ['p', 't']:
+                    self.word = self.word.replace('her', 'hes')
+            elif self.word.endswith('ent'):
+                if self.word[-4] != 'm':
+                    self.word = self.word.replace('ent', 's')
+        
         else:
             suffix = ''
             suffix_list = [end for end in RECODES if self.word.endswith(end)]

@@ -1,44 +1,32 @@
-VOWELS = frozenset(['a', 'e', 'i', 'o', 'u', 'y'])
-DOUBLES = frozenset(['bb', 'dd', 'ff', 'gg', 'mm', 'nn', 'pp', 'rr', 'tt'])
-LI_ENDING = frozenset(['c', 'd', 'e', 'g', 'h', 'k', 'm', 'n', 'r', 't'])
-INVARIANTS = frozenset(['sky', 'news', 'howe', 'atlas', 'cosmos', 'bias',
-                       'andes'])
-EXCEPTIONS = frozenset(['skis', 'skies', 'dying', 'lying', 'tying', 'idly',
-                        'gently', 'ugly', 'early', 'only', 'singly', 'inning',
-                        'outing', 'canning', 'herring', 'earring', 'proceed',
-                        'exceed', 'succeed'])
-
-class PorterStemmer(object):
-    
+class PorterStemmer(object):    
     def __init__(self):
         self.word = None 
         self.r1 = 0
         self.r2 = 0
 
     def stem(self, word):
-        if word.startswith("'"):
-            word = word[1:]
-        if word.startswith("y"):
-            word[0] = 'Y'
-        if any(x in word for x in ['ay', 'ey', 'iy', 'oy', 'uy']):
-            index = word.find('y')
-            word[index] = 'Y'
         self.word = word
+        if self.word.startswith("'"):
+            self.word = self.word[1:]
+        if self.word.startswith("y"):
+            self.word = self.word.replace('y', 'Y')
+        if any(x in word for x in ['ay', 'ey', 'iy', 'oy', 'uy']):
+            self.word = self.word.replace('y', 'Y')
         if self.word in [EXCEPTIONS or INVARIANTS]:
             self._exception_handler()
-            yield self.word
+            return self.word
         self._region_finder()
         self.step0()
         self.step1a()
         if self.word in EXCEPTIONS:
-            yield self.word
+            return self.word
         self.step1b()
         self.step1c()
         self.step2()
         self.step3()
         self.step4()
         self.step5()
-        yield self.word
+        return self.word
 
     def _region_finder(self):
         for i in xrange(1, len(self.word)):
@@ -158,7 +146,7 @@ class PorterStemmer(object):
                 self.word = self.word.replace(suffix, 'ic')
             if suffix in ['ful', 'ness']:
                 self.word = self.word.replace(suffix, '')
-            if suffix == 'ative' and suffix in word[self.r2:]:
+            if suffix == 'ative' and suffix in self.word[self.r2:]:
                 self.word = self.word.replace(suffix, '')
 
     def step4(self):
@@ -186,7 +174,9 @@ class PorterStemmer(object):
         self.word = self.word.lower()
 
     def _short_finder(self):
-        if (self.word[self.r1:] == ''
+        if len(self.word) < 3:
+            return False
+        elif (self.word[self.r1:] == ''
         and self.word[-3] not in VOWELS 
         and self.word[-2] in VOWELS 
         and self.word[-1] not in VOWELS or ['w', 'x' 'Y']):
@@ -219,3 +209,13 @@ class PorterStemmer(object):
             self.word = 'onli'
         elif self.word == 'singly':
             self.word = 'singl'
+
+VOWELS = frozenset(['a', 'e', 'i', 'o', 'u', 'y'])
+DOUBLES = frozenset(['bb', 'dd', 'ff', 'gg', 'mm', 'nn', 'pp', 'rr', 'tt'])
+LI_ENDING = frozenset(['c', 'd', 'e', 'g', 'h', 'k', 'm', 'n', 'r', 't'])
+INVARIANTS = frozenset(['sky', 'news', 'howe', 'atlas', 'cosmos', 'bias',
+                       'andes'])
+EXCEPTIONS = frozenset(['skis', 'skies', 'dying', 'lying', 'tying', 'idly',
+                        'gently', 'ugly', 'early', 'only', 'singly', 'inning',
+                        'outing', 'canning', 'herring', 'earring', 'proceed',
+                        'exceed', 'succeed'])

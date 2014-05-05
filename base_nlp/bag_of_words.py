@@ -13,7 +13,7 @@ from collections import Counter, defaultdict
 
 class Bow:
 
-    def __init__(self, topdir=None, tokenizer='word_size', stemmmer=None, 
+    def __init__(self, topdir=None, tokenizer='word_size', stemmer=None, 
                  stop_words=True, min_word_len=4, max_word_pct=1, min_word_cnt=0, 
                  max_vocab_size=100000):
         """
@@ -80,11 +80,11 @@ class Bow:
                 self.stop_words = stop_list
 
         if stemmer == 'porter':
-            self.stem = PorterStemmer()
+            self.stemmer = PorterStemmer()
         elif stemmer == 'lovins':
-            self.stem = LovinsStemmer()
+            self.stemmer = LovinsStemmer()
         elif not stemmer:
-            self.stem = None
+            self.stemmer = None
         else:
             raise ValueError('%s is not a valid stemmer') % stemmer
 
@@ -128,11 +128,11 @@ class Bow:
                 id_list.append((file.split('.')[0]))
                 with open(os.path.join(root, file), 'rb') as text_file:
                     text = text_file.read()
-                words = self._word_tokenize(text)
+                words = self._word_tokenize(text) 
                 tokens = [w.encode('utf-8', 'ignore').decode('utf-8').lower()
                           for w in words if w not in self.stop_words]
                 if self.stemmer:
-                    tokens = [self.stemmer.stem(t) for t in tokens]
+                    tokens = [self.stemmer.stem(t) for t in tokens] 
                 
                 yield tokens
         
