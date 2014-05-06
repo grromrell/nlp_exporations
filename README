@@ -15,15 +15,14 @@ the focus will be on more advanced tools.
 ----------
 Short Term
 ----------
-
-    1. N-gram support
-    2. LDA
-    3. LSI
-    4. Advanced tokenization
+    1. Fix augmented DF 
+    2. N-gram support
+    3. LDA
+    4. LSI
+    5. Advanced tokenization
 ---------
 Long Term
 ---------
-    
     1. Cython?
     2. POS Tagger
     3. Named Entity Recognition
