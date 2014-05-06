@@ -213,7 +213,7 @@ class Bow:
         """
         counts = np.bincount(self.word_matrix.indices)
         idf = np.log(self.doc_cnt/(counts + 1))
-        if augmented_df:
+        if augmented_df: #TODO: Write a sparse np.amax alternative
             maxes = np.array(np.amax(self.word_matrix.todense(), axis=1), dtype=np.float)
             aug_maxes = (1/(1+maxes))
             self.word_matrix = sp.csr_matrix(self.word_matrix.multiply(aug_maxes))
