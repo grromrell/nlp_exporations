@@ -51,7 +51,7 @@ class LovinsStemmer(object):
             elif suffix in SUFFIXES[268:269]:
                 if len(self.word.replace(suffix, '')) >= 3:
                     if self.word.replace(suffix, '')[-1] in ['l', 'i']:
-                        if re.search(r'u.e', self.word.replace(suffix, '')): #[:-3]:
+                        if re.search(r'u.e', self.word.replace(suffix, ''))[:-3]:
                             self.word = self.word.replace(suffix, '')
             elif suffix in SUFFIXES[269:271]:
                 if self.word.replace(suffix, '')[:-2] == 'os':
