@@ -1,92 +1,31 @@
 base_nlp
 --------
 
-This package is meant to hold some basic nlp tools, with the goal to get
-more sophisticated over time.
+This package is currently pre-release and under development. The goal of this 
+package is to be a more experimental Natural Language Processing module. The 
+current options are basically limited to NLTK, scikit-learn and gensim. NLTK 
+is meant as a teaching tool and scikit learn only implements tokenization and
+tfidf, while gensim is specifically focused on topic modelling. It seems there 
+is a niche for a more advanced tool that attempts to implement the "state of the
+art" tools. Before we get there we must first cover the basics that are already
+implemented elsewhere. This is the current stage of development. Moving forward
+the focus will be on more advanced tools.
 
-Tutorial
---------
-
-There are currently two modules: bag_of_words and cluster. Bag_of_words is 
-undergoing experimentation with the tokenization for speed improvements,
-and cluster currently only contains DBSCAN.
-
-[bag_of_words]
-
-The purpose of the bag_of_words module (henceforth called BOW) is to do exactly
-what is sounds like, support bag of words representation of text documents. This
-representation is helpful for document similarity and clustering analysis. To 
-read more see: http://bit.ly/1qlKOtp
-
-The BOW module is class focused, thus there is a definite work flow that can be
-followed to keep track of your information. The main class is called 'Bow' and
-this tutorial will focus on using it.
-
-    1. The first step is to import the module and start a Bow object. You have
-       several options as to how you want to use this object, whether with a sql
-       query, a directory or a pandas dataframe. We will use a a directory in
-       this example.
-
-            $ipython
-            In [1]: from base_nlp import bag_of_word as nlp
-            In [2]: bow = nlp.Bow(method = 'dir', topdir = '/work/username/file/'
-        
-       Here we passed a method parameter that told the object we want to import
-       from text files, and the location of those text files. This will then
-       create an object we can work this call 'bow.'
-
-    2. Next we will 'vectorize' our text. This will turn to text into 'tokens',
-       which mean individual words, and then into a bag of words representation,
-       using vectors.
-
-            In [3]: bow.vectorizer(stem = True)
-
-       Here use the 'stem' option, which will cut off the suffix of words for a
-       better match (i.e.: Doorknob and Doorknobs will become the same word). 
-       This is useful for accuracy and speed, but can hurt readability of the 
-       text. Also notice that the vectorizer did not return the matrix or the
-       vocab that we would expect. That is because they are stored inside the
-       object, to get access to them call:
-
-            In [4]: bow.word_matrix
-            Out[4]: <1000x1000 sparse matrix ...>
-            In [5]: bow.vocab
-            Out[5]: {word1 : 1}...
-
-    3. Now sometimes the size of vectors are too large so we can use rule based
-       measures to remove some values.
-
-            In [6]: bow.trim_vocab(max_word_pct = .3, max_vocab_size = 100)
-
-       This will remove all words that appear in more than 30% of all documents
-       and restrict the maximum vocabulary size to 100 words.
-
-    4. The final thing we want to do is transform the documents into a tf-idf
-       representation. This will weight the terms according to their relative
-       importance, for more info see: http://bit.ly/1sIh6Re
-
-           In [7]: bow.tfidf()
-
-       And we are done! By calling bow.word_matrix, you can get acces to your 
-       newly transformed data and use it to cluster or any number of things!
-    
-    5. There is further functionality in this module, such as gensim compatibil-
-       ity and csv writers, and these functions are documented in the code. 
 
 ----------
 Short Term
 ----------
 
-    1. Investigate stemmer options, particularly Prter and Lovins
-
+    1. N-gram support
+    2. LDA
+    3. LSI
+    4. Advanced tokenization
 ---------
 Long Term
 ---------
     
-    1. N-gram support
-    2. Include tools that can take advantage of bag of words approach, like 
-       topic modelling and latent semantic analysis
-    3. Include native support for many different distance measures 
-       (or just use scipy?)
-    4. Cython?
-    5. More advanced tokenization methods (Penn Treebank, Stanford)
+    1. Cython?
+    2. POS Tagger
+    3. Named Entity Recognition
+    4. Depedency Parser
+    5. Etc.
