@@ -6,6 +6,7 @@ import array
 import csv
 import os
 import re
+from utilities import sparse_amax
 from stemmers.porter import PorterStemmer
 from stemmers.lovins import LovinsStemmer
 from stop_words import stop_list
@@ -213,10 +214,9 @@ class Bow:
         """
         counts = np.bincount(self.word_matrix.indices)
         idf = np.log(self.doc_cnt/(counts + 1))
-        if augmented_df: #TODO: Write a sparse np.amax alternative
-            maxes = np.array(np.amax(self.word_matrix.todense(), axis=1), dtype=np.float)
-            aug_maxes = (1/(1+maxes))
-            self.word_matrix = sp.csr_matrix(self.word_matrix.multiply(aug_maxes))
+        if augmented_df:
+            maxes = sparse_amax(self.word_matrix)
+            self.word_matrix = self.word_matrix.multiply(maxes)
         diag_matrix = sp.spdiags(idf, 0, len(counts), len(counts))
         tfidf_matrix = self.word_matrix * diag_matrix
         self.word_matrix = tfidf_matrix

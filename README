@@ -14,12 +14,11 @@ the focus will be on more advanced tools.
 
 ----------
 Short Term
-----------
-    1. Fix augmented DF 
-    2. N-gram support
-    3. LDA
-    4. LSI
-    5. Advanced tokenization
+---------- 
+    1. N-gram support
+    2. LDA
+    3. LSI
+    4. Advanced tokenization
 ---------
 Long Term
 ---------
