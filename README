@@ -1,15 +1,8 @@
 base_nlp
 --------
 
-This package is currently pre-release and under development. The goal of this 
-package is to be a more experimental Natural Language Processing module. The 
-current options are basically limited to NLTK, scikit-learn and gensim. NLTK 
-is meant as a teaching tool and scikit learn only implements tokenization and
-tfidf, while gensim is specifically focused on topic modelling. It seems there 
-is a niche for a more advanced tool that attempts to implement the "state of the
-art" tools. Before we get there we must first cover the basics that are already
-implemented elsewhere. This is the current stage of development. Moving forward
-the focus will be on more advanced tools.
+This was work I started when I was just getting started in NLP. I have worked on it in a while
+but its a nice little time capsule.
 
 
 ----------
